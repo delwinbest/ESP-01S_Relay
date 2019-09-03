@@ -1,13 +1,13 @@
 # ESP-01S Relay Firmware #
 
-##Features##
+## Features ##
 * WifiManager
 * Wifi Credential Storage
 * OTA
 
-##Required Libraries##
+## Required Libraries ##
 * WiFiManager
 * ArduinoOTA
 
-##Misc##
+## Misc ##
 * 3D printed Case: https://www.thingiverse.com/thing:3004571
