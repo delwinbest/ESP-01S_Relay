@@ -11,12 +11,14 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 
 void setup() {
   delay(1000);
-  Serial.begin(115200);
+  pinMode(RELAY, OUTPUT); 
+  digitalWrite(RELAY,LOW);
+  //Serial.begin(115200);
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wm;
   //reset settings - for testing
-  // wm.resetSettings();
+  //wm.resetSettings();
   //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
   wm.setAPCallback(configModeCallback);
 
@@ -32,21 +34,21 @@ void setup() {
   WiFi.hostname(WIFI_HOSTNAME);
   
   ArduinoOTA.onStart([]() {
-    Serial.println("Start updating ");
+    //Serial.println("Start updating ");
   });
   ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
+    //Serial.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    //Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) { Serial.println("Auth Failed"); }
-    else if (error == OTA_BEGIN_ERROR) { Serial.println("Begin Failed"); }
-    else if (error == OTA_CONNECT_ERROR) { Serial.println("Connect Failed"); }
-    else if (error == OTA_RECEIVE_ERROR) { Serial.println("Receive Failed"); }
-    else if (error == OTA_END_ERROR) { Serial.println("End Failed"); }
+    //Serial.printf("Error[%u]: ", error);
+    //if (error == OTA_AUTH_ERROR) { Serial.println("Auth Failed"); }
+    //else if (error == OTA_BEGIN_ERROR) { Serial.println("Begin Failed"); }
+    //else if (error == OTA_CONNECT_ERROR) { Serial.println("Connect Failed"); }
+    //else if (error == OTA_RECEIVE_ERROR) { Serial.println("Receive Failed"); }
+    //else if (error == OTA_END_ERROR) { Serial.println("End Failed"); }
   });
   // Start the server
   server.begin();
@@ -63,28 +65,28 @@ void loop() {
   }
  
   // Wait until the client sends some data
-  Serial.println("new client");
-  while(!client.available())
-  {
-    delay(1);
-  }
+  //Serial.println("new client");
+  //while(!client.available())
+  //{
+  //  delay(1);
+  //}
 
   // Read the first line of the request
   String request = client.readStringUntil('\r');
-  Serial.println(request);
+  //Serial.println(request);
   client.flush();
  
   // Match the request
   int value = LOW;
   if (request.indexOf("/RELAY=ON") != -1)  
   {
-    Serial.println("RELAY=ON");
+    //Serial.println("RELAY=ON");
     digitalWrite(RELAY,LOW);
     value = LOW;
   }
   if (request.indexOf("/RELAY=OFF") != -1)  
   {
-    Serial.println("RELAY=OFF");
+    //Serial.println("RELAY=OFF");
     digitalWrite(RELAY,HIGH);
     value = HIGH;
   }
@@ -109,10 +111,10 @@ void loop() {
   client.println("<br><br>");
   client.println("Turn <a href=\"/RELAY=OFF\">OFF</a> RELAY<br>");
   client.println("Turn <a href=\"/RELAY=ON\">ON</a> RELAY<br>");
-    client.println("</html>");
- 
-  delay(1);
-  Serial.println("Client disonnected");
-  Serial.println("");
+  client.println("</html>");
+  client.stop();
+  delay(2);
+  //Serial.println("Client disonnected");
+  //Serial.println("");
 
 }
