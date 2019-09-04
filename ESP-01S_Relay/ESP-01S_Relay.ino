@@ -8,7 +8,7 @@ WiFiServer server(80);
 String header;
 
 // Auxiliar variables to store the current output state
-String relayState = "off";
+String relayState = "on";
 bool configMode = false;
 
 // Current time
@@ -45,7 +45,7 @@ void setup() {
   //if it does not connect it starts an access point with the specified name
   //here  "AutoConnectAP"
   //and goes into a blocking loop awaiting configuration
-  if (!wm.autoConnect(WIFI_HOSTNAME,"pa55w0rd")) {
+  if (!wm.autoConnect()) {
     //reset and try again, or maybe put it to deep sleep
     ESP.restart();
     delay(1000);
