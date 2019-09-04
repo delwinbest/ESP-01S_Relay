@@ -1,2 +1,3 @@
 #define WIFI_HOSTNAME   "esprelay"
-#define RELAY 0 // relay connected to  GPIO0
+// Assign output relay connected to  GPIO0
+const int relayPin = 0;

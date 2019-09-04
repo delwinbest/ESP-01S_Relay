@@ -10,9 +10,6 @@ String header;
 // Auxiliar variables to store the current output state
 String relayState = "off";
 
-// Assign output variables to GPIO pins
-const int relayPin = 2;
-
 // Current time
 unsigned long currentTime = millis();
 // Previous time
@@ -33,7 +30,6 @@ void setup() {
   // Set outputs to LOW
   digitalWrite(relayPin, LOW);
   
-  //Serial.begin(115200);
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wm;
@@ -55,21 +51,12 @@ void setup() {
 
   ArduinoOTA.setHostname(WIFI_HOSTNAME);
   ArduinoOTA.onStart([]() {
-    //Serial.println("Start updating ");
   });
   ArduinoOTA.onEnd([]() {
-    //Serial.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    //Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    //Serial.printf("Error[%u]: ", error);
-    //if (error == OTA_AUTH_ERROR) { Serial.println("Auth Failed"); }
-    //else if (error == OTA_BEGIN_ERROR) { Serial.println("Begin Failed"); }
-    //else if (error == OTA_CONNECT_ERROR) { Serial.println("Connect Failed"); }
-    //else if (error == OTA_RECEIVE_ERROR) { Serial.println("Receive Failed"); }
-    //else if (error == OTA_END_ERROR) { Serial.println("End Failed"); }
   });
   // Start the server
   server.begin();
@@ -82,7 +69,6 @@ void loop() {
   WiFiClient client = server.available();   // Listen for incoming clients
 
   if (client) {                             // If a new client connects,
-    Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     currentTime = millis();
     previousTime = currentTime;
@@ -90,7 +76,6 @@ void loop() {
       currentTime = millis();         
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -105,13 +90,11 @@ void loop() {
             
             // turns the GPIOs on and off
             if (header.indexOf("GET /relay/on") >= 0) {
-              Serial.println("Relay on");
               relayState = "on";
-              digitalWrite(relayPin, HIGH);
-            } else if (header.indexOf("GET /relay/off") >= 0) {
-              Serial.println("Relay off");
-              relayState = "off";
               digitalWrite(relayPin, LOW);
+            } else if (header.indexOf("GET /relay/off") >= 0) {
+              relayState = "off";
+              digitalWrite(relayPin, HIGH);
             } 
             
             // Display the HTML web page
@@ -155,8 +138,7 @@ void loop() {
     header = "";
     // Close the connection
     client.stop();
-    Serial.println("Client disconnected.");
-    Serial.println("");
+
   }
 
 }
