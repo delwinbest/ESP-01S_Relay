@@ -76,6 +76,7 @@ void loop() {
       currentTime = millis();         
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
+        String responseType = "html";
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -89,39 +90,57 @@ void loop() {
             client.println();
             
             // turns the GPIOs on and off
-            if (header.indexOf("GET /relay/on") >= 0) {
+            if (header.indexOf("GET /html/relay/on") >= 0) {
               relayState = "on";
               digitalWrite(relayPin, LOW);
+              responseType = "html";
+            } else if (header.indexOf("GET /html/relay/off") >= 0) {
+              relayState = "off";
+              digitalWrite(relayPin, HIGH);
+              responseType = "html";
             } else if (header.indexOf("GET /relay/off") >= 0) {
               relayState = "off";
               digitalWrite(relayPin, HIGH);
+              responseType = "cli";
+            } else if (header.indexOf("GET /relay/on") >= 0) {
+              relayState = "on";
+              digitalWrite(relayPin, HIGH);
+              responseType = "cli";
+            } else if (header.indexOf("GET /status") >= 0) {
+              responseType = "cli";
             } 
-            
-            // Display the HTML web page
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            // CSS to style the on/off buttons 
-            // Feel free to change the background-color and font-size attributes to fit your preferences
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #77878A;}</style></head>");
-            
-            // Web Page Heading
-            client.println("<body><h1>ESP8266 Web Server</h1>");
-            
-            // Display current state, and ON/OFF buttons for GPIO 5  
-            client.println("<p>Relay - State " + relayState + "</p>");
-            // If the relayState is off, it displays the ON button       
-            if (relayState=="off") {
-              client.println("<p><a href=\"/relay/on\"><button class=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/relay/off\"><button class=\"button button2\">OFF</button></a></p>");
-            } 
-               
-            client.println("</body></html>");
-            
+
+            if (responseType == "html") {
+              // Display the HTML web page
+              client.println("<!DOCTYPE html><html>");
+              client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
+              client.println("<link rel=\"icon\" href=\"data:,\">");
+              // CSS to style the on/off buttons 
+              // Feel free to change the background-color and font-size attributes to fit your preferences
+              client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
+              client.println(".button { background-color: #195B6A; border: none; color: white; padding: 16px 40px;");
+              client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
+              client.println(".button2 {background-color: #77878A;}</style></head>");
+              
+              // Web Page Heading
+              client.println("<body><h1>ESP8266 Web Server</h1>");
+              
+              // Display current state, and ON/OFF buttons for GPIO 5  
+              client.println("<p>Relay - State " + relayState + "</p>");
+              // If the relayState is off, it displays the ON button       
+              if (relayState=="off") {
+                client.println("<p><a href=\"/html/relay/on\"><button class=\"button\">ON</button></a></p>");
+              } else {
+                client.println("<p><a href=\"/html/relay/off\"><button class=\"button button2\">OFF</button></a></p>");
+              } 
+              client.println("</body></html>");
+            } else if (responseType == "cli") {
+              if (relayState=="off") {
+                client.println("0");
+              } else {
+                client.println("1");
+              }               
+            }
             // The HTTP response ends with another blank line
             client.println();
             // Break out of the while loop
