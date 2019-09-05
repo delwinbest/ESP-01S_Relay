@@ -2,6 +2,7 @@
 // Relay operates in Normally Close (NC) Mode. If you need to using Normally Open contacts, then flip the digitalWrite(relayPin, HIGH) lines from
 // HIGH to LOW and visa versa
 // OTA consumes 301248 bytes (29% of 1M or 60% of 512k PROGMEM) ESP01 with 512K flash memory is not enough for OTA
+// ENSURE FLASH SIZE IS SET AT 1M(no SPIFFS) in Arduino Programmer
 
 #include "settings.h"
 #include <WiFiManager.h>
@@ -47,7 +48,7 @@ void setup() {
   //if it does not connect it starts an access point with the specified name
   //here  "AutoConnectAP"
   //and goes into a blocking loop awaiting configuration
-  if (!wm.autoConnect()) {
+  if (!wm.autoConnect(WIFI_HOSTNAME, "pa55w0rd")) {
     //reset and try again, or maybe put it to deep sleep
     ESP.restart();
     delay(1000);
@@ -107,7 +108,7 @@ void loop() {
               responseTypeHTML = false;
             } else if (header.indexOf("GET /relay/on") >= 0) {
               relayState = "on";
-              digitalWrite(relayPin, HIGH);
+              digitalWrite(relayPin, LOW);
               responseTypeHTML = false;
             } else if (header.indexOf("GET /status") >= 0) {
               responseTypeHTML = false;
