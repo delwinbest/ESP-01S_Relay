@@ -76,7 +76,7 @@ void loop() {
       currentTime = millis();         
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        String responseType = "html";
+        bool responseTypeHTML = true;
         header += c;
         if (c == '\n') {                    // if the byte is a newline character
           // if the current line is blank, you got two newline characters in a row.
@@ -93,24 +93,22 @@ void loop() {
             if (header.indexOf("GET /html/relay/on") >= 0) {
               relayState = "on";
               digitalWrite(relayPin, LOW);
-              responseType = "html";
             } else if (header.indexOf("GET /html/relay/off") >= 0) {
               relayState = "off";
               digitalWrite(relayPin, HIGH);
-              responseType = "html";
             } else if (header.indexOf("GET /relay/off") >= 0) {
               relayState = "off";
               digitalWrite(relayPin, HIGH);
-              responseType = "cli";
+              responseTypeHTML = false;
             } else if (header.indexOf("GET /relay/on") >= 0) {
               relayState = "on";
               digitalWrite(relayPin, HIGH);
-              responseType = "cli";
+              responseTypeHTML = false;
             } else if (header.indexOf("GET /status") >= 0) {
-              responseType = "cli";
+              responseTypeHTML = false;
             } 
 
-            if (responseType == "html") {
+            if (responseTypeHTML == true) {
               // Display the HTML web page
               client.println("<!DOCTYPE html><html>");
               client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -136,7 +134,7 @@ void loop() {
               client.println("</body></html>");
               // The HTTP response ends with another blank line
               client.println();
-            } else if (responseType == "cli") {
+            } else {  // Else response type is cli
               if (relayState=="off") {
                 client.println("0");
               } else {
