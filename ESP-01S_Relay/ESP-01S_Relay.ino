@@ -1,3 +1,8 @@
+// ESP-01S Relay Code
+// Relay operates in Normally Close (NC) Mode. If you need to using Normally Open contacts, then flip the digitalWrite(relayPin, HIGH) lines from
+// HIGH to LOW and visa versa
+// OTA consumes 301248 bytes (29% of 1M or 60% of 512k PROGMEM) ESP01 with 512K flash memory is not enough for OTA
+
 #include "settings.h"
 #include <WiFiManager.h>
 #include <ArduinoOTA.h>
